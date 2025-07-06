@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Школьный портал</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    .login-container h2 {
+      text-align: center;
+      color: #3366cc;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+    }
+    .success {
+      color: green;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>🔐 Вход в систему</h2>
+    <input type="text" id="login" placeholder="Логин" />
+    <input type="password" id="password" placeholder="Пароль" />
+    <button onclick="login()">➡️ Войти</button>
+    <div class="error" id="error"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCB-ByqdkIZvJZRN4BGwZU9LTUnhVBF0",
+      authDomain: "w-0001-158e0.firebaseapp.com",
+      projectId: "w-0001-158e0",
+      storageBucket: "w-0001-158e0.appspot.com",
+      messagingSenderId: "657434394478",
+      appId: "1:657434394478:web:7cb5f34dc24cf80ec4b7f"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function login() {
+      const login = document.getElementById("login").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorDiv = document.getElementById("error");
+      errorDiv.textContent = "";
+
+      if (!login || !password) {
+        errorDiv.textContent = "Пожалуйста, заполните оба поля.";
+        return;
+      }
+
+      try {
+        const docRef = db.collection("accessCodes").doc(login);
+        const doc = await docRef.get();
+
+        if (doc.exists && doc.data().password === password) {
+          alert("Успешный вход как " + doc.data().role);
+          // Здесь можно перенаправить на панель администратора
+          // window.location.href = "admin.html";
+        } else {
+          errorDiv.textContent = "Неверное имя пользователя или пароль";
+        }
+      } catch (error) {
+        errorDiv.textContent = "Ошибка входа: " + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
